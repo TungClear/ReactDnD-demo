@@ -1,9 +1,11 @@
 import React from 'react';
-import { Card } from 'antd';
+import { Card, Input } from 'antd';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import DragCard from './DragCard';
 import update from 'immutability-helper';
+
+const { TextArea } = Input;
 class CardDemo extends React.Component {
 
 	constructor(props) {
@@ -48,13 +50,24 @@ class CardDemo extends React.Component {
 		);
 	}
 
+	handleOnSelect = (event) => {
+		const {value} = event.target
+		console.log(value);
+		const selection = value.substring(event.target.selectionStart, event.target.selectionEnd);
+		console.log(selection);
+	}
+
 	render() {
 		const { cards } = this.state;
 		console.dir(`done move: ${JSON.stringify(cards)}`);
 		return (
-			<div className="wrap-card">
-				{cards.map((item, index) => {
-					return (
+			<React.Fragment>
+				<div>
+					<TextArea placeholder="Autosize height based on content lines" autosize onSelect={this.handleOnSelect}/>
+				</div>
+				<div className="wrap-card">
+					{cards.map((item, index) => {
+						return (
 							<DragCard
 								key={index}
 								index={index}
@@ -71,9 +84,10 @@ class CardDemo extends React.Component {
 								</Card>
 								<div style={{ height: '50px' }}></div>
 							</DragCard>
-					);
-				})}
-			</div>
+						);
+					})}
+				</div>
+			</React.Fragment>
 		)
 	}
 
