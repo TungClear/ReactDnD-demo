@@ -1,0 +1,35 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.wrap-content{
+  align-items: center;
+  font-size: calc(10px + 2vmin);
+  min-height: 100vh;
+  margin-top: 50px;
+  border: 1px solid #000000;
+}
+
+.wrap-card{
+  margin: 50px 0;
+  border: 1px solid #bfbfbf;
+}
+
+.wrap-card .ant-card{
+  /* margin: 30px 0; */
+}
+
+.wrap-card .ant-card-head{
+  background: #e8e8e8;
+  padding: 0;
+}
