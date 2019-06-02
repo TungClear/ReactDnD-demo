@@ -11,7 +11,8 @@ class ReactContentEditable extends Component {
 	constructor() {
 		super();
 		this.state = {
-			html: `Hello World <span class="bg-color" contenteditable="false" style="background:${arrayColor[3]}">thuong em la</span> dieu anh khong the ngo`,
+			// html: `Hello World <span class="bg-color" contenteditable="false" style="background:${arrayColor[3]}">thuong em la</span> dieu anh khong the ngo`,
+			html: `Hello World thuong em la dieu anh khong the ngo Hello world`,
 			editable: true,
 			selection: '',
 			clientX: 0,
@@ -19,26 +20,30 @@ class ReactContentEditable extends Component {
 			count: 0,
 			textValue: '',
 			isDisplay: false,
+			arraySelected: [
+				// {
+				// 	key: 0,//vị trí span màu tính từ index 0 của textValue
+				// 	startIndex: 0,
+				// 	endIndex: 0,
+				// 	name: '',//tên entities
+				// }
+			],
+			key: 0,
+			range: '',
 		};
 	}
 
 	componentDidMount() {
 		const { html } = this.state;
 		const edits = document.getElementsByClassName('editable');
-		console.log(edits);
-		// edit.forEach(element => {
-		// 	let span = element.getElementsByTagName('span')
-		// 	span.forEach(el => {
-		// 		el.addEventListener("click", this.displayDropdownMenu)
-		// 	})
-		// });
+		// console.log(edits);
 		for (let i = 0; i < edits.length; i++) {
 			let span = edits[i].getElementsByTagName('span');
-			console.log(span);
+			// console.log(span);
 			if (span) {
 				for (let j = 0; j < span.length; j++) {
 					span[j].addEventListener('click', () => this.displayDropdownMenu(span[j].innerText));
-					console.log(span[j].innerText);
+					// console.log(span[j].innerText);
 				}
 			}
 		}
@@ -46,19 +51,6 @@ class ReactContentEditable extends Component {
 			textValue: sanitizeHtml(html, this.sanitizeConf)
 		})
 	}
-
-	displayDropdownMenu = (text) => {
-		this.setState({ isDisplay: true, selection: text })
-	}
-
-	handleChangeEdit = evt => {
-		const { html } = this.state;
-
-		this.setState({
-			html: evt.target.value,
-			textValue: sanitizeHtml(evt.target.value, this.sanitizeConf),
-		});
-	};
 
 	sanitizeConf = {
 		allowedTags: ["b", "i", "em", "strong", "a", "p", "h1"],
@@ -68,67 +60,6 @@ class ReactContentEditable extends Component {
 	sanitize = () => {
 		this.setState({ html: sanitizeHtml(this.state.html, this.sanitizeConf) });
 	};
-
-	handleOnMouseUp = (event) => {
-		const { clientX, clientY } = event;
-		const { value } = event.target;
-		const { html } = this.state;
-		console.log("innerText", event.target.innerText);
-		console.log("html", html);
-		if (window.getSelection) {
-			const sel = window.getSelection();
-			this.setState({
-				selection: sel.toString(),
-				clientX,
-				clientY
-			})
-		}
-
-	}
-
-	handleOnMouseDown = (event) => {
-		this.setState({
-			selection: '',
-			isDisplay: false
-		})
-		this.clearAllRanges();
-	}
-
-	handleChange = () => {
-	}
-
-	addEntity = () => {
-		//tắt dropdown và tô màu selected text
-		let { selection, html } = this.state;
-		const indexStart = html.indexOf(selection);
-		//tự động lấy thành chữ có nghĩa và trim 2 đầu
-		let newStr = `<span class="bg-color" contenteditable="false" style="background:${arrayColor[0]}">${selection}</span>`;
-		if (indexStart !== -1) {
-			html = html.toString();
-			newStr = newStr.toString()
-			html = html.replace(selection, newStr);
-			this.setState({
-				html,
-				selection: '',
-				textValue: sanitizeHtml(html, this.sanitizeConf),
-				isDisplay: false,
-			})
-		};
-
-		this.clearAllRanges()
-
-		// let span = document.createElement('span');
-		// if (window.selection) {
-		// 	const sel = window.getSelection();
-		// 	const selection = sel.toString();
-		// 	let startContainer = sel.getRangeAt(0).startContainer;
-		// 	const childNodes = sel.getRangeAt(0).commonAncestorContainer.childNodes;
-		// 	let index = 0;
-		// 	startContainer = childNodes.filter(item => item.isEqualNode(startContainer))
-
-		// }
-
-	}
 
 	clearAllRanges = () => {
 		if (window.getSelection) {
@@ -142,35 +73,153 @@ class ReactContentEditable extends Component {
 		}
 	}
 
+	displayDropdownMenu = (text) => {
+		this.setState({ isDisplay: true, selection: text })
+	}
+
+	handleChangeEdit = evt => {
+		this.setState({
+			html: evt.target.value,
+			textValue: sanitizeHtml(evt.target.value, this.sanitizeConf),
+		});
+	};
+
+	handleOnMouseUp = (event) => {
+		const { clientX, clientY } = event;
+		const { value } = event.target;
+		const { html } = this.state;
+		if (window.getSelection) {
+			const sel = window.getSelection();
+			if (sel.toString().trim() === "") return;
+			this.setState({
+				selection: sel.toString(),
+				clientX,
+				clientY,
+				range: window.getSelection().getRangeAt(0)
+			})
+		}
+	}
+
+	handleOnMouseDown = (event) => {
+		this.setState({
+			selection: '',
+			isDisplay: false,
+			range: '',
+		})
+		this.clearAllRanges();
+	}
+
+	addEntity = () => {
+		//tắt dropdown và tô màu selected text
+		let { selection, html, textValue, arraySelected, key, range } = this.state;
+		const indexStart = range.startOffset, indexEnd = range.endOffset;
+
+		if (arraySelected.length > 0) {
+			const currentObject = {
+				indexStart: indexStart,
+				indexEnd: indexEnd,
+				key: key,
+				selection: selection,
+			}
+
+			arraySelected = this.checkOut(currentObject, arraySelected);
+			
+			arraySelected.forEach(item => {
+				let newStr = `<span class="bg-color" contenteditable="false" style="background:${arrayColor[0]}">${item.selection}</span>`;
+				return { ...item, newStr: newStr }
+			})
+			console.log(arraySelected);
+			
+			this.sortByStart(arraySelected);
+			arraySelected.reverse();
+
+			arraySelected.forEach(item => {
+				html = this.replaceAt(html, item.newStr, item.indexStart, item.indexEnd);
+			})
+
+			this.setState({
+				html: html,
+				key: key + 1,
+				selection: '',
+				isDisplay: false,
+				range: "",
+			})
+
+		} else {
+			let newStr = `<span class="bg-color" contenteditable="false" style="background:${arrayColor[0]}">${selection}</span>`;
+			if (indexStart !== -1) {
+				textValue = this.replaceAt(textValue, newStr, indexStart, indexEnd);
+				let select = {
+					key: key,
+					indexStart: indexStart,
+					indexEnd: indexEnd,
+					selection: selection,
+				}
+				arraySelected = [...arraySelected, select];
+
+				console.log(arraySelected);
+				this.setState({
+					html: textValue,
+					selection: '',
+					isDisplay: false,
+					arraySelected: arraySelected,
+					range: "",
+					key: key + 1,
+				})
+			};
+			this.clearAllRanges()
+		}
+	}
+
+	replaceAt = (input, replace, start, end) => {
+		return input.slice(0, start)
+			+ replace
+			+ input.slice(end);
+	}
+
+	checkOut = (currentObject, arraySelected) => {
+		arraySelected = arraySelected.map(item => {
+			if (item.indexStart > currentObject.indexEnd || item.indexEnd < currentObject.indexStart) {
+				//remove các span nằm trong
+				//đang sai chỗ này
+				return;
+			}
+			return item;
+		});
+		arraySelected.push(currentObject);
+		console.log(arraySelected);
+		return arraySelected
+	}
+
+	sortByStart = (array) => {
+		return array.sort((a, b) => (a.indexStart > b.indexStart) ? 1 : ((b.indexStart > a.indexStart) ? -1 : 0));
+	}
+
 	render = () => {
-		const { selection, clientX, clientY, html, editable, textValue, isDisplay } = this.state;
-		console.log(html);
-		console.log(textValue);
-		console.log(isDisplay);
-		
+		const { selection, clientX, clientY, html, editable, textValue, isDisplay, range } = this.state;
 		return (
 			<div>
 				<h3>editable contents</h3>
-				<ContentEditable
-					className="editable"
-					tagName="pre"
-					html={html} // innerHTML of the editable div
-					disabled={!editable} // use true to disable edition
-					onChange={this.handleChangeEdit} // handle innerHTML change
+				<div>
+					<ContentEditable
+						className="editable"
+						tagName="div"
+						html={html} // innerHTML of the editable div
+					// onChange={this.handleChangeEdit} // handle innerHTML change
 					// onBlur={this.sanitize}
-					onMouseUp={this.handleOnMouseUp}
-					onMouseDown={this.handleOnMouseDown}
-				/>
-				<ContentEditable
-					className="editable-2"
-					tagName="pre"
-					html={html} // innerHTML of the editable div
-					disabled={!editable} // use true to disable edition
-					onChange={this.handleChangeEdit} // handle innerHTML change
-					// onBlur={this.sanitize}
-					onMouseUp={this.handleOnMouseUp}
-					onMouseDown={this.handleOnMouseDown}
-				/>
+					// onMouseUp={this.handleOnMouseUp}
+					// onMouseDown={this.handleOnMouseDown}
+					/>
+					<ContentEditable
+						className="editable-2"
+						tagName="div"
+						html={textValue} // innerHTML of the editable div
+						onChange={this.handleChangeEdit} // handle innerHTML change
+						// onBlur={this.sanitize}
+						onMouseUp={this.handleOnMouseUp}
+						onMouseDown={this.handleOnMouseDown}
+					/>
+				</div>
 				{
 					//sau khi dropdown tắt thì set selection = ''
 					((clientX && clientY && selection !== '') || isDisplay)
@@ -188,7 +237,7 @@ class ReactContentEditable extends Component {
 				<textarea
 					className="editable"
 					value={html}
-					onChange={this.handleChange}
+				// onChange={this.handleChange}
 				// onBlur={this.sanitize}
 				/>
 			</div>
