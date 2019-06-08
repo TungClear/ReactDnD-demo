@@ -32,15 +32,6 @@ class CardDemo extends React.Component {
 
 		const dragCard = cards[dragIndex];
 
-		// const dragIndex = cards.findIndex(el => el.id === dragId);
-		// const hoverIndex = cards.findIndex(el => el.id === hoverId);
-		// const newState = update(this.state, {
-		//   cards: {
-		//     [dragIndex]: { order: { $set: hoverCardOrder } },
-		//     [hoverIndex]: { order: { $set: dragCardOrder } }
-		//   }
-		// });
-		// this.setState(newState);
 		this.setState(
 			update(this.state, {
 				cards: {

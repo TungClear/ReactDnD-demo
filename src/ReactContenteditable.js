@@ -12,13 +12,13 @@ class ReactContentEditable extends Component {
 		super();
 		this.state = {
 			// html: `Hello World <span class="bg-color" contenteditable="false" style="background:${arrayColor[3]}">thuong em la</span> dieu anh khong the ngo`,
-			html: `Hello World thuong em la dieu anh khong the ngo Hello world`,
+			html: `Hello&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; World thuong em la dieu anh khong the ngo Hello world`,
 			editable: true,
 			selection: '',
 			clientX: 0,
 			clientY: 0,
 			count: 0,
-			textValue: '',
+			textValue: `Hello&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; World thuong em la dieu anh khong the ngo Hello world`,
 			isDisplay: false,
 			arraySelected: [
 				// {
@@ -26,6 +26,7 @@ class ReactContentEditable extends Component {
 				// 	startIndex: 0,
 				// 	endIndex: 0,
 				// 	name: '',//tên entities
+				//  selection,
 				// }
 			],
 			key: 0,
@@ -34,22 +35,6 @@ class ReactContentEditable extends Component {
 	}
 
 	componentDidMount() {
-		const { html } = this.state;
-		const edits = document.getElementsByClassName('editable');
-		// console.log(edits);
-		for (let i = 0; i < edits.length; i++) {
-			let span = edits[i].getElementsByTagName('span');
-			// console.log(span);
-			if (span) {
-				for (let j = 0; j < span.length; j++) {
-					span[j].addEventListener('click', () => this.displayDropdownMenu(span[j].innerText));
-					// console.log(span[j].innerText);
-				}
-			}
-		}
-		this.setState({
-			textValue: sanitizeHtml(html, this.sanitizeConf)
-		})
 	}
 
 	sanitizeConf = {
@@ -86,18 +71,29 @@ class ReactContentEditable extends Component {
 
 	handleOnMouseUp = (event) => {
 		const { clientX, clientY } = event;
-		const { value } = event.target;
-		const { html } = this.state;
-		if (window.getSelection) {
-			const sel = window.getSelection();
-			if (sel.toString().trim() === "") return;
-			this.setState({
-				selection: sel.toString(),
-				clientX,
-				clientY,
-				range: window.getSelection().getRangeAt(0)
-			})
+		// const { value } = event.target;
+		const {textValue} = this.state;
+		
+		// const { html } = this.state;
+		// if (window.getSelection) {
+		// 	const sel = window.getSelection();
+		// 	if (sel.toString().trim() === "") return;
+		// 	this.setState({
+		// 		selection: sel.toString(),
+		// 		clientX,
+		// 		clientY,
+		// 		range: window.getSelection().getRangeAt(0)
+		// 	})
+		// }
+		if(window.getSelection){
+			if(window.getSelection().toString().trim() === ""){
+				return;
+			}else{
+				let range = window.getSelection().getRangeAt(0);
+				this.getSelection(range.startOffset, range.endOffset, textValue);
+			}
 		}
+		
 	}
 
 	handleOnMouseDown = (event) => {
@@ -195,6 +191,25 @@ class ReactContentEditable extends Component {
 		return array.sort((a, b) => (a.indexStart > b.indexStart) ? 1 : ((b.indexStart > a.indexStart) ? -1 : 0));
 	}
 
+	getSelection = (startOffset, endOffset, textValue) => {
+		console.log(textValue, textValue.charAt(startOffset) === " ");
+		console.log(startOffset, textValue.charCodeAt(startOffset));
+		
+		if(textValue.charCodeAt(startOffset) === 32 || textValue.charCodeAt(startOffset) === 160){
+			console.log(textValue.charCodeAt(startOffset) !== 32 || textValue.charCodeAt(startOffset) !== 160);
+			// while(textValue.charAt(startOffset) !== " "){
+				
+			// 	startOffset--;
+			// 	console.log(startOffset);
+			// }
+		}else{
+			// while(startOffset === 0 || startOffset === " "){
+			// 	startOffset++;
+			// }
+		}
+		console.log(startOffset);
+	}
+
 	render = () => {
 		const { selection, clientX, clientY, html, editable, textValue, isDisplay, range } = this.state;
 		return (
@@ -213,7 +228,7 @@ class ReactContentEditable extends Component {
 					<ContentEditable
 						className="editable-2"
 						tagName="div"
-						html={textValue} // innerHTML of the editable div
+						html={sanitizeHtml(html, this.sanitizeConf)} // innerHTML of the editable div
 						onChange={this.handleChangeEdit} // handle innerHTML change
 						// onBlur={this.sanitize}
 						onMouseUp={this.handleOnMouseUp}
