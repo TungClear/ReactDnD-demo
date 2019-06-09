@@ -640,7 +640,7 @@ class Training extends Component {
 					keyOfItem: clickedNode.keyOfItem, color: color,
 				};
 				let beforeUpdate = arraySelected.find(item => item.key === clickedNode.key);
-				if(beforeUpdate === undefined){
+				if (beforeUpdate === undefined) {
 					return;
 				}
 				if (arraySelected.length > 0) {

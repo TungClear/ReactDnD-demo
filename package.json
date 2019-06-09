@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^3.18.1",
+    "antd": "^3.19.2",
     "immutability-helper": "^3.0.0",
     "react": "^16.8.6",
     "react-contenteditable": "^3.2.6",

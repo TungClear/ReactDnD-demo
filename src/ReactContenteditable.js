@@ -88,6 +88,8 @@ class ReactContentEditable extends Component {
 		const { clientX, clientY } = event;
 		const { value } = event.target;
 		const { html } = this.state;
+		console.log(11111111111111111111);
+		
 		if (window.getSelection) {
 			const sel = window.getSelection();
 			if (sel.toString().trim() === "") return;
@@ -95,7 +97,8 @@ class ReactContentEditable extends Component {
 				selection: sel.toString(),
 				clientX,
 				clientY,
-				range: window.getSelection().getRangeAt(0)
+				range: window.getSelection().getRangeAt(0),
+				isDisplay: true,
 			})
 		}
 	}
@@ -197,6 +200,9 @@ class ReactContentEditable extends Component {
 
 	render = () => {
 		const { selection, clientX, clientY, html, editable, textValue, isDisplay, range } = this.state;
+		console.log(isDisplay);
+		console.log(selection);
+		
 		return (
 			<div>
 				<h3>editable contents</h3>

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { Card, Icon, Table, Input } from 'antd';
-import EmptySpace from '../emptySpace';
+// import EmptySpace from '../emptySpace';
 
 import {
 	updateResponses
@@ -17,96 +17,138 @@ class CardText extends Component {
 	handleAdd = () => {
 		let { dispatchUpdateResponses, intentDetailReducer, platform, keyItem, speech } = this.props;
 		let { responses } = intentDetailReducer;
-		const length = speech.length;
-		const newData = {
-			key: length + 1,
-			text: '',
-		};
-		speech = [...speech, newData];
-		let platformData = responses.find(item => item.platform === platform);
-		let messages = platformData.messages.map(item => {
-			if(item.key === keyItem){
-				item.speech = speech;
-				return item;
-			}
-			return item;
-		});
-		responses = responses.map((item, index) => {
-			if (item.platform === platform) {
-				item.messages = messages;
-				return item;
-			}
-			return item;
-		});
+		// const length = speech.length;
+		// const newData = {
+		// 	key: length + 1,
+		// 	text: '',
+		// };
+		// speech = [...speech, newData];
+		// let platformData = responses.find(item => item.platform === platform);
+		// let messages = platformData.messages.map(item => {
+		// 	if(item.key === keyItem){
+		// 		item.speech = speech;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+		// responses = responses.map((item, index) => {
+		// 	if (item.platform === platform) {
+		// 		item.messages = messages;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
 
+		responses = responses.map((objResponse) =>
+			objResponse.platform === platform ?
+				{
+					...objResponse,
+					messages:
+						objResponse.messages.map((objMsg) => (objMsg.key === keyItem ? { ...objMsg, speech: objMsg.speech.push('') } : objMsg))
+				}
+				: objResponse
+		);
 		dispatchUpdateResponses(responses);
 	};
 
 	handleDelete = (keySpeech) => {
 		let { dispatchUpdateResponses, intentDetailReducer, platform, keyItem, speech } = this.props;
 		let { responses } = intentDetailReducer;
-		speech = speech.filter((item, index) =>
-			item.key !== parseInt(keySpeech, 10)
+		// speech = speech.filter((item, index) =>
+		// 	item.key !== parseInt(keySpeech, 10)
+		// );
+		// speech = speech.map((item, index) => {
+		// 	item.key = index + 1;
+		// 	return item;
+		// });
+
+		// let platformData = responses.find(item => item.platform === platform);
+		// let messages = platformData.messages.map(item => {
+		// 	if (item.key === keyItem) {
+		// 		item.speech = speech;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+		// responses = responses.map((item, index) => {
+		// 	if (item.platform === platform) {
+		// 		item.messages = messages;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+		responses = responses.map((objResponse) =>
+			objResponse.platform === platform ?
+				{
+					...objResponse,
+					messages:
+						objResponse.messages.map((objMsg) => (objMsg.key === keyItem ? { ...objMsg, speech: objMsg.speech.filter((objSpeech, objSpeechIndex) => objSpeechIndex !== parseInt(keySpeech, 10))} : objMsg))
+				}
+				: objResponse
 		);
-		speech = speech.map((item, index) => {
-			item.key = index + 1;
-			return item;
-		});
-
-		let platformData = responses.find(item => item.platform === platform);
-		let messages = platformData.messages.map(item => {
-			if(item.key === keyItem){
-				item.speech = speech;
-				return item;
-			}
-			return item;
-		});
-		responses = responses.map((item, index) => {
-			if (item.platform === platform) {
-				item.messages = messages;
-				return item;
-			}
-			return item;
-		});
-
 		dispatchUpdateResponses(responses);
 	}
 
-	handleChange = (e, index) => {
+	handleChange = (e, keySpeech) => {
 		//keu la key cua message do
 		let { dispatchUpdateResponses, intentDetailReducer, platform, keyItem, speech } = this.props;
 		let { responses } = intentDetailReducer;
+		// const { value } = e.target;
+
+		// speech = speech.map((item, i) => {
+		// 	if (item.key === index.key) {
+		// 		item.text = value;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+
+		// let platformData = responses.find(item => item.platform === platform);
+		// let messages = platformData.messages.map(item => {
+		// 	if (item.key === keyItem) {
+		// 		item.speech = speech;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+		// responses = responses.map((item, index) => {
+		// 	if (item.platform === platform) {
+		// 		item.messages = messages;
+		// 		return item;
+		// 	}
+		// 	return item;
+		// });
+
 		const { value } = e.target;
-
-		speech = speech.map((item, i) => {
-			if (item.key === index.key) {
-				item.text = value;
-				return item;
-			}
-			return item;
-		});
-
-		let platformData = responses.find(item => item.platform === platform);
-		let messages = platformData.messages.map(item => {
-			if(item.key === keyItem){
-				item.speech = speech;
-				return item;
-			}
-			return item;
-		});
-		responses = responses.map((item, index) => {
-			if (item.platform === platform) {
-				item.messages = messages;
-				return item;
-			}
-			return item;
-		});
-
+		responses = responses.map((objResponse) =>
+			objResponse.platform === platform ?
+				{
+					...objResponse,
+					messages:
+						objResponse.messages.map((objMsg) => (objMsg.key === keyItem ? { ...objMsg, speech: objMsg.speech.map((objSpeech, objSpeechIndex) => objSpeechIndex === keySpeech ? value : objSpeech)} : objMsg))
+				}
+				: objResponse
+		);
 		dispatchUpdateResponses(responses);
 	}
 
+	//khi hiển thị dùng hàm này add vô, khi hiển thị key + 1
+	addPropKeyToSpeech = (speech) => {
+		return speech.map((objSpeech, index) => {
+			return { text: objSpeech, key: index }
+		});
+	}
+
+	//khi gửi lên update thì dùng hàm này
+	removePropKey = (speech) => {
+		return speech.map(objItem => {
+			return objItem.map(item => item.text);
+		})
+	}
+
 	render() {
-		const { title, extraHeaderCardText, speech } = this.props;
+		let { title, extraHeaderCardText, speech } = this.props;
+		speech = this.addPropKeyToSpeech(speech);
 		return (
 			<Fragment>
 				<Card title={title} extra={extraHeaderCardText()}>
@@ -119,7 +161,7 @@ class CardText extends Component {
 						<Column
 							dataIndex='key'
 							className="newIntent-response-card-text-column-key"
-							// render={(record, index) => record}
+						// render={(record, index) => record}
 						/>
 						<Column
 							dataIndex='text'
@@ -129,7 +171,7 @@ class CardText extends Component {
 									autosize={{ minRows: 1 }}
 									placeholder="Enter a text response"
 									value={record}
-									onChange={(e) => this.handleChange(e, index)}
+									onChange={(e) => this.handleChange(e, index.key)}
 								/>
 							}
 						/>
@@ -145,7 +187,7 @@ class CardText extends Component {
 						<Icon type="plus" />
 					</div>
 				</Card>
-				<EmptySpace size={1} />
+				{/* <EmptySpace size={1} /> */}
 			</Fragment >
 		);
 	}

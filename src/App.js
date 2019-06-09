@@ -3,6 +3,8 @@ import './App.css';
 import CardDemo from './Card';
 import 'antd/dist/antd.css';
 import ContentEditable from './ReactContenteditable';
+
+import CardText from './cardText'
 function App() {
   return (
     <div className="App">
@@ -10,7 +12,8 @@ function App() {
         {/* <CardDemo /> */}
         NEW hEADER
         <ContentEditable />
-        </div>
+        {/* <CardText /> */}
+      </div>
     </div>
   );
 }
