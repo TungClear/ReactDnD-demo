@@ -1,0 +1,16 @@
+                // <Select
+                //   mode="multiple"
+                //   placeholder="Enter entity"
+                //   value={this.convertObjectEntityToArrayName(parameters[index.key])}
+                //   onDeselect={(selectItem) => this.onDeselectEntity(selectItem, index)}
+                //   onSelect={selectItem => this.onSelectEntitiy(selectItem, index)}
+                //   // onChange={selectItem => this.handleChangeListEntity(selectItem, index)}
+                //   style={{ width: '100%' }}
+                //   disabled={index.required === 2 ? false : true}
+                // >
+                //   {entities.map(item => (
+                //     <Select.Option key={item._id} value={item.name} className="newIntent-event-select-dropdown-item">
+                //       {item.name}
+                //     </Select.Option>
+                //   ))}
+                // </Select>
